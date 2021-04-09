@@ -1,0 +1,42 @@
+{
+  "name": "pixi-emote-selector",
+  "version": "1.0.0",
+  "description": "💬😜 Emote Selector for pixi.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "tsc",
+    "start": "parcel example/index.html",
+    "build": "parcel build example/index.html --public-url /pixi-emote-selector",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endel/pixi-emote-selector.git"
+  },
+  "keywords": [
+    "pixi",
+    "emote",
+    "selector",
+    "prompt"
+  ],
+  "author": "Endel Dreyer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/endel/pixi-emote-selector/issues"
+  },
+  "homepage": "https://github.com/endel/pixi-emote-selector#readme",
+  "devDependencies": {
+    "@gamestdio/easing": "^1.0.0",
+    "images": "^3.2.3",
+    "parcel": "^1.12.4",
+    "typescript": "^4.1.2"
+  },
+  "peerDependencies": {
+    "pixi.js": "^5.3.3"
+  }
+}
