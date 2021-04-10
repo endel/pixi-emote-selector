@@ -1,6 +1,6 @@
 declare var require: any; // parcel/typescript workaround.
 
-import * as PIXI from "pixi.js";
+import * as PIXI from "pixi.js-legacy";
 import { EmoteSelector } from "../src/";
 
 // Pixel-art friendly

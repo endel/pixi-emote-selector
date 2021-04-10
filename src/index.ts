@@ -97,13 +97,13 @@ export class EmoteSelector extends PIXI.Container {
 
     this.on("added", () => {
       document.addEventListener("contextmenu", this.disableContextMenu);
-      // document.addEventListener("mousedown", this.onMouseDownCallback);
+      document.addEventListener("mousedown", this.onMouseDownCallback);
       document.addEventListener("mouseup", this.onMouseUpCallback);
     });
 
     this.on("removed", () => {
       document.removeEventListener("contextmenu", this.disableContextMenu);
-      // document.removeEventListener("mousedown", this.onMouseDownCallback);
+      document.removeEventListener("mousedown", this.onMouseDownCallback);
       document.removeEventListener("mouseup", this.onMouseUpCallback);
     });
   }
@@ -156,16 +156,15 @@ export class EmoteSelector extends PIXI.Container {
 
   destroy() {
     document.removeEventListener("contextmenu", this.disableContextMenu);
-    // document.removeEventListener("mousedown", this.onMouseDownCallback);
+    document.removeEventListener("mousedown", this.onMouseDownCallback);
     document.removeEventListener("mouseup", this.onMouseUpCallback);
   }
 
-  // onMouseDownCallback = (ev: MouseEvent) => {
-  //   ev.preventDefault();
-  //   if (ev.button === 2) {
-  //     this.open();
-  //   }
-  // }
+  onMouseDownCallback = (ev: MouseEvent) => {
+    if (ev.button === 2) {
+      this.open(ev.offsetX, ev.offsetY);
+    }
+  }
 
   onMouseUpCallback = (ev: MouseEvent) => {
     ev.preventDefault();
@@ -176,7 +175,6 @@ export class EmoteSelector extends PIXI.Container {
 
   disableContextMenu = (ev: MouseEvent) => {
     ev.preventDefault();
-    this.open(ev.offsetX, ev.offsetY);
   }
 
   open(positionX: number, positionY: number) {
