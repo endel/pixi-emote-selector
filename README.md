@@ -25,6 +25,8 @@ const emoteSelector = new EmoteSelector({
 app.stage.addChild(emoteSelector);
 ```
 
+The assets used on this demo are taken from [Kenney's Emotes Pack](https://kenney.nl/assets/emotes-pack).
+
 ## License
 
 Endel Dreyer © MIT
