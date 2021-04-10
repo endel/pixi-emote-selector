@@ -9,6 +9,7 @@ PIXI.settings.ROUND_PIXELS = true;
 PIXI.settings.RESOLUTION = window.devicePixelRatio;
 
 PIXI.Loader.shared
+  .add('balloon', require("./images/balloon.png")) 
   .add('emote_exclamation', require("./images/emote_exclamation.png")) 
   .add('emote_heart', require("./images/emote_heart.png")) 
   .add('emote_laugh', require("./images/emote_laugh.png")) 
@@ -43,6 +44,21 @@ function initialize() {
   });
   emoteSelector.position.x = window.innerWidth / 2;
   emoteSelector.position.y = window.innerHeight / 2;
+
+  // const remove = () => {
+  //   console.log("REMOVE");
+  //   app.stage.removeChild(emoteSelector);
+  //   setTimeout(add, 1000);
+  // };
+
+  // const add = () => {
+  //   console.log("ADD");
+  //   app.stage.addChild(emoteSelector);
+  //   setTimeout(remove, 3000);
+  // }
+
+  // add();
+
   app.stage.addChild(emoteSelector);
 
   const resize = () => {

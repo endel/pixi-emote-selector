@@ -1,5 +1,7 @@
 import * as PIXI from "pixi.js";
 
+const IS_MOBILE = /Mobi/i.test(window.navigator.userAgent);
+
 export interface EmoteSelectorOptions {
   options?: PIXI.Sprite[],
   onItemSelected: (selectedIndex: number) => void;
@@ -94,15 +96,15 @@ export class EmoteSelector extends PIXI.Container {
     }
 
     this.on("added", () => {
-      window.addEventListener("contextmenu", this.disableContextMenu);
-      // window.addEventListener("mousedown", this.onMouseDownCallback);
-      window.addEventListener("mouseup", this.onMouseUpCallback);
+      document.addEventListener("contextmenu", this.disableContextMenu);
+      // document.addEventListener("mousedown", this.onMouseDownCallback);
+      document.addEventListener("mouseup", this.onMouseUpCallback);
     });
 
     this.on("removed", () => {
-      window.removeEventListener("contextmenu", this.disableContextMenu);
-      // window.removeEventListener("mousedown", this.onMouseDownCallback);
-      window.removeEventListener("mouseup", this.onMouseUpCallback);
+      document.removeEventListener("contextmenu", this.disableContextMenu);
+      // document.removeEventListener("mousedown", this.onMouseDownCallback);
+      document.removeEventListener("mouseup", this.onMouseUpCallback);
     });
   }
 
@@ -153,9 +155,9 @@ export class EmoteSelector extends PIXI.Container {
   }
 
   destroy() {
-    window.removeEventListener("contextmenu", this.disableContextMenu);
-    // window.removeEventListener("mousedown", this.onMouseDownCallback);
-    window.removeEventListener("mouseup", this.onMouseUpCallback);
+    document.removeEventListener("contextmenu", this.disableContextMenu);
+    // document.removeEventListener("mousedown", this.onMouseDownCallback);
+    document.removeEventListener("mouseup", this.onMouseUpCallback);
   }
 
   // onMouseDownCallback = (ev: MouseEvent) => {
@@ -178,8 +180,6 @@ export class EmoteSelector extends PIXI.Container {
   }
 
   open(positionX: number, positionY: number) {
-    console.log("OPEN!");
-
     this.scale.set(1);
     this.alpha = 1;
     this.clear();
@@ -238,8 +238,6 @@ export class EmoteSelector extends PIXI.Container {
     // };
 
     // ticker.add(this._hide);
-
-    console.log("CLOSE");
   }
 
 }
