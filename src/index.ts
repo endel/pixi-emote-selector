@@ -93,9 +93,17 @@ export class EmoteSelector extends PIXI.Container {
       });
     }
 
-    window.addEventListener("contextmenu", this.disableContextMenu);
-    // window.addEventListener("mousedown", this.onMouseDownCallback);
-    window.addEventListener("mouseup", this.onMouseUpCallback);
+    this.on("added", () => {
+      window.addEventListener("contextmenu", this.disableContextMenu);
+      // window.addEventListener("mousedown", this.onMouseDownCallback);
+      window.addEventListener("mouseup", this.onMouseUpCallback);
+    });
+
+    this.on("removed", () => {
+      window.removeEventListener("contextmenu", this.disableContextMenu);
+      // window.removeEventListener("mousedown", this.onMouseDownCallback);
+      window.removeEventListener("mouseup", this.onMouseUpCallback);
+    });
   }
 
   clear() {
