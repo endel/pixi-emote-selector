@@ -43,6 +43,7 @@ function initialize() {
     options,
     mobileButton,
     onItemSelected: (itemSelected) => {
+      console.log(`${itemSelected} selected.`);
       statusText.text = `${itemSelected} selected.`;
     },
   });

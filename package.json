@@ -1,6 +1,6 @@
 {
   "name": "pixi-emote-selector",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "description": "💬😜 Emote Selector for pixi.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

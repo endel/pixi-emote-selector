@@ -26,6 +26,7 @@ export class EmoteSelector extends PIXI.Container {
   private options: EmoteSelectorOptions;
 
   private selectionOptions: PIXI.DisplayObject[];
+  private isOpen: boolean = false;
 
   _show?: () => void;
   _hide?: () => void;
@@ -148,6 +149,7 @@ export class EmoteSelector extends PIXI.Container {
     if (this.selectedOption) {
       this.selectedOption.tint = 0xffffff;
       this.selectedOption.alpha = this.unselectedAlpha;
+      this.selectedIndex = -1;
     }
   }
 
@@ -173,12 +175,14 @@ export class EmoteSelector extends PIXI.Container {
     option.pivot.y = -this.size/2;
 
     const onPointerOver = () => {
-      // unselect previous selection
-      this.clear();
-      option.tint = this.hoverColor;
-      option.alpha = this.selectedAlpha;
-      this.selectedIndex = index;
-      this.selectedOption = option;
+      if (this.isOpen) {
+        // unselect previous selection
+        this.clear();
+        option.tint = this.hoverColor;
+        option.alpha = this.selectedAlpha;
+        this.selectedIndex = index;
+        this.selectedOption = option;
+      }
     }
 
     (option as PIXI.DisplayObject).on("touchmove", (e) => {
@@ -222,6 +226,8 @@ export class EmoteSelector extends PIXI.Container {
   }
 
   open(positionX: number, positionY: number) {
+    this.isOpen = true;
+
     if (IS_MOBILE) {
       this.selectionOptions.forEach(option => option.visible = true);
 
@@ -258,6 +264,8 @@ export class EmoteSelector extends PIXI.Container {
   }
 
   close() {
+    this.isOpen = false;
+
     const ticker = PIXI.Ticker.shared;
 
     if (IS_MOBILE) {
@@ -275,6 +283,7 @@ export class EmoteSelector extends PIXI.Container {
 
     if (this.selectedIndex !== -1) {
       this.options.onItemSelected(this.selectedIndex);
+      this.clear();
     }
 
     let initialTime: number;
@@ -288,7 +297,6 @@ export class EmoteSelector extends PIXI.Container {
     //   this.scale.set(1 - easing.expoOut(t));
 
     //   if (t >= 1) {
-    //     console.log("REMOVE HIDE!");
     //     ticker.remove(this._hide!);
     //     this._hide = undefined;
     //   }
