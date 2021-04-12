@@ -4,6 +4,7 @@ const IS_MOBILE = /Mobi/i.test(window.navigator.userAgent);
 
 export interface EmoteSelectorOptions {
   options?: PIXI.Sprite[],
+  mobileButton?: PIXI.Sprite,
   onItemSelected: (selectedIndex: number) => void;
 }
 
@@ -24,6 +25,8 @@ export class EmoteSelector extends PIXI.Container {
   private hoverColor = 0xffffff;
   private options: EmoteSelectorOptions;
 
+  private selectionOptions: PIXI.DisplayObject[];
+
   _show?: () => void;
   _hide?: () => void;
 
@@ -31,8 +34,6 @@ export class EmoteSelector extends PIXI.Container {
     super();
 
     this.options = opts;
-
-    this.scale.set(0);
 
     const option1 = this.getOptionGraphics(0);
     option1.angle = -45;
@@ -61,29 +62,7 @@ export class EmoteSelector extends PIXI.Container {
     option4.position.x += this.size - this.distanceFromCenter + (this.margin * 2);
     option4.scale.set(-1);
 
-    /**
-     * CLose button
-     */
-    const closeButton = new PIXI.Graphics();
-    this.setLineStyle(closeButton);
-    closeButton.alpha = this.unselectedAlpha;
-    closeButton.beginFill(0xffffff);
-    closeButton.drawCircle(0, 0, this.distanceFromCenter - this.margin * 2);
-
-    closeButton.interactive = true;
-    (closeButton as PIXI.DisplayObject).on("pointerover", () => {
-      // unselect previous selection
-      this.clear();
-      closeButton.tint = this.hoverColor;
-      closeButton.alpha = this.selectedAlpha;
-      this.selectedIndex = -1;
-    });
-    (closeButton as PIXI.DisplayObject).on("pointerout", () => {
-      closeButton.tint = 0xffffff;
-      closeButton.alpha = this.unselectedAlpha;
-    });
-
-    this.addChild(closeButton);
+    this.selectionOptions = [option1, option2, option3, option4];
 
     const options = [option1, option2, option3, option4];
     if (opts.options) {
@@ -92,19 +71,75 @@ export class EmoteSelector extends PIXI.Container {
         const child = this.addChild(icon);
         child.position.x = optionBackground.x - child.width / 2;
         child.position.y = optionBackground.y - child.height / 2;
+        this.selectionOptions.push(child);
       });
+    }
+
+    /**
+     * Close button
+     */
+    const closeButton = new PIXI.Graphics();
+    this.setLineStyle(closeButton);
+    closeButton.beginFill(0xffffff);
+    closeButton.drawCircle(0, 0, this.distanceFromCenter - this.margin * 2);
+
+    closeButton.interactive = true;
+    this.addChild(closeButton);
+
+    // add mobile button on top of closeButton
+    if (IS_MOBILE) {
+      closeButton.alpha = 0;
+      (closeButton as PIXI.DisplayObject).on("pointerdown", (e) => this.open(this.x, this.y));
+      (closeButton as PIXI.DisplayObject).on("pointerup", (e) => this.close());
+
+      if (opts.mobileButton) {
+        const mobileButton = this.addChild(opts.mobileButton);
+        mobileButton.x -= (mobileButton.width / 2);
+        mobileButton.y -= (mobileButton.height / 2);
+      }
+
+      (closeButton as PIXI.DisplayObject).on("pointerover", () => {
+        // unselect previous selection
+        this.clear();
+        closeButton.tint = this.hoverColor;
+        this.selectedIndex = -1;
+      });
+      (closeButton as PIXI.DisplayObject).on("pointerout", () => {
+        closeButton.tint = 0xffffff;
+      });
+
+      this.selectionOptions.forEach(option => option.visible = false);
+
+    } else {
+      this.visible = false;
+
+      (closeButton as PIXI.DisplayObject).on("pointerover", () => {
+        // unselect previous selection
+        this.clear();
+        closeButton.tint = this.hoverColor;
+        closeButton.alpha = this.selectedAlpha;
+        this.selectedIndex = -1;
+      });
+      (closeButton as PIXI.DisplayObject).on("pointerout", () => {
+        closeButton.tint = 0xffffff;
+        closeButton.alpha = this.unselectedAlpha;
+      });
+
+      closeButton.alpha = this.unselectedAlpha;
     }
 
     this.on("added", () => {
       document.addEventListener("contextmenu", this.disableContextMenu);
       document.addEventListener("mousedown", this.onMouseDownCallback);
       document.addEventListener("mouseup", this.onMouseUpCallback);
+      document.addEventListener("touchend", this.onTouchEndCallback);
     });
 
     this.on("removed", () => {
       document.removeEventListener("contextmenu", this.disableContextMenu);
       document.removeEventListener("mousedown", this.onMouseDownCallback);
       document.removeEventListener("mouseup", this.onMouseUpCallback);
+      document.removeEventListener("touchend", this.onTouchEndCallback);
     });
   }
 
@@ -137,18 +172,23 @@ export class EmoteSelector extends PIXI.Container {
     option.pivot.x = -this.size/2;
     option.pivot.y = -this.size/2;
 
-    (option as PIXI.DisplayObject).on("pointerover", () => {
+    const onPointerOver = () => {
       // unselect previous selection
       this.clear();
       option.tint = this.hoverColor;
       option.alpha = this.selectedAlpha;
       this.selectedIndex = index;
       this.selectedOption = option;
+    }
+
+    (option as PIXI.DisplayObject).on("touchmove", (e) => {
+      if (option.containsPoint(e.data.global)) {
+        onPointerOver();
+      }
     });
 
-    (option as PIXI.DisplayObject).on("pointerout", () => {
-      // option.tint = 0xffffff;
-      // this.selectedIndex = -1;
+    (option as PIXI.DisplayObject).on("pointerover", () => {
+        onPointerOver();
     });
 
     return option;
@@ -158,6 +198,10 @@ export class EmoteSelector extends PIXI.Container {
     document.removeEventListener("contextmenu", this.disableContextMenu);
     document.removeEventListener("mousedown", this.onMouseDownCallback);
     document.removeEventListener("mouseup", this.onMouseUpCallback);
+  }
+
+  onTouchEndCallback = () => {
+    this.close();
   }
 
   onMouseDownCallback = (ev: MouseEvent) => {
@@ -178,8 +222,16 @@ export class EmoteSelector extends PIXI.Container {
   }
 
   open(positionX: number, positionY: number) {
-    this.scale.set(1);
-    this.alpha = 1;
+    if (IS_MOBILE) {
+      this.selectionOptions.forEach(option => option.visible = true);
+
+    } else {
+      this.visible = true;
+    }
+
+    // this.scale.set(1);
+    // this.alpha = 1;
+
     this.clear();
 
     const ticker = PIXI.Ticker.shared;
@@ -208,8 +260,15 @@ export class EmoteSelector extends PIXI.Container {
   close() {
     const ticker = PIXI.Ticker.shared;
 
-    this.scale.set(0);
-    this.alpha = 0;
+    if (IS_MOBILE) {
+      this.selectionOptions.forEach(option => option.visible = false);
+
+    } else {
+      this.visible = false;
+    }
+
+    // this.scale.set(0);
+    // this.alpha = 0;
 
     // if (this._show) { ticker.remove(this._show) }
     // if (this._hide) { ticker.remove(this._hide) }

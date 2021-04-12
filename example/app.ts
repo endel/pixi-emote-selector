@@ -1,6 +1,6 @@
 declare var require: any; // parcel/typescript workaround.
 
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js"; // -legacy
 import { EmoteSelector } from "../src/";
 
 // Pixel-art friendly
@@ -36,28 +36,18 @@ function initialize() {
   ];
   options.forEach(option => option.scale.set(3));
 
+  const mobileButton = PIXI.Sprite.from('balloon');
+  mobileButton.scale.set(3);
+
   const emoteSelector = new EmoteSelector({
     options,
+    mobileButton,
     onItemSelected: (itemSelected) => {
       statusText.text = `${itemSelected} selected.`;
     },
   });
   emoteSelector.position.x = window.innerWidth / 2;
   emoteSelector.position.y = window.innerHeight / 2;
-
-  // const remove = () => {
-  //   console.log("REMOVE");
-  //   app.stage.removeChild(emoteSelector);
-  //   setTimeout(add, 1000);
-  // };
-
-  // const add = () => {
-  //   console.log("ADD");
-  //   app.stage.addChild(emoteSelector);
-  //   setTimeout(remove, 3000);
-  // }
-
-  // add();
 
   app.stage.addChild(emoteSelector);
 
